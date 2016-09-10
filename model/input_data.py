@@ -14,8 +14,8 @@ def get_file_name(date):
 def get_data(date=''):
     train_name, tour_name = get_file_name(date)
     train = pd.read_csv(train_name, delimiter=',')
-    tour = pd.read_csv(tour_name, delimiter=',')
-    
+    tour = pd.read_csv(tour_name, delimiter=',', index_col=[0])
+
     return train, tour
 
 def output_pred(data, model, date=''):
@@ -24,4 +24,3 @@ def output_pred(data, model, date=''):
     else:
         file_name = os.path.abspath(__file__ + "/../../data/%s.csv" % model)
     data.to_csv(file_name)
-    

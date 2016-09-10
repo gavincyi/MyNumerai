@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/user/bin/python
 
 '''
 A simple Python wrapper for the bh_tsne binary that makes it easier to use it
@@ -201,33 +201,36 @@ def run_bh_tsne(input_file, no_dims=2, perplexity=50, theta=0.5, randseed=-1, ve
     tmp_dir_path = mkdtemp()
 
     # Load data in forked process to free memory for actual bh_tsne calculation
-    child_pid = os.fork()
-    if child_pid == 0:
-        init_bh_tsne(input_file, tmp_dir_path, no_dims=no_dims, perplexity=perplexity, theta=theta, randseed=randseed,verbose=verbose, initial_dims=initial_dims, use_pca=use_pca, max_iter=max_iter)
-        sys.exit(0)
-    else:
-        os.waitpid(child_pid, 0)
-        res = []
-        for result in bh_tsne(tmp_dir_path, verbose):
-            sample_res = []
-            for r in result:
-                sample_res.append(r)
-            res.append(sample_res)
-        rmtree(tmp_dir_path)
-        return np.asarray(res, dtype='float64')
+    # child_pid = os.fork()
+    # print("child_pid = %d" % child_pid)
+    # if child_pid == 0:
+    #     print("Run init_bh_tsne")
+    init_bh_tsne(input_file, tmp_dir_path, no_dims=no_dims, perplexity=perplexity, theta=theta, randseed=randseed,verbose=verbose, initial_dims=initial_dims, use_pca=use_pca, max_iter=max_iter)
+        # sys.exit(0)
+    # else:
+        # print("Run bh_tsne")
+        # os.waitpid(child_pid, 0)
+    res = []
+    for result in bh_tsne(tmp_dir_path, verbose):
+        sample_res = []
+        for r in result:
+            sample_res.append(r)
+        res.append(sample_res)
+    rmtree(tmp_dir_path)
+    return np.asarray(res, dtype='float64')
 
 
-def main(args):
-    argp = _argparse().parse_args(args[1:])
-    
-    for result in run_bh_tsne(argp.input, no_dims=argp.no_dims, perplexity=argp.perplexity, theta=argp.theta, randseed=argp.randseed,
-            verbose=argp.verbose, initial_dims=argp.initial_dims, use_pca=argp.use_pca, max_iter=argp.max_iter):
-        fmt = ''
-        for i in range(1, len(result)):
-            fmt = fmt + '{}\t'
-        fmt = fmt + '{}\n'
-        argp.output.write(fmt.format(*result))
-
-if __name__ == '__main__':
-    from sys import argv
-    exit(main(argv))
+# def main(args):
+#     argp = _argparse().parse_args(args[1:])
+#
+#     for result in run_bh_tsne(argp.input, no_dims=argp.no_dims, perplexity=argp.perplexity, theta=argp.theta, randseed=argp.randseed,
+#             verbose=argp.verbose, initial_dims=argp.initial_dims, use_pca=argp.use_pca, max_iter=argp.max_iter):
+#         fmt = ''
+#         for i in range(1, len(result)):
+#             fmt = fmt + '{}\t'
+#         fmt = fmt + '{}\n'
+#         argp.output.write(fmt.format(*result))
+#
+# if __name__ == '__main__':
+#     from sys import argv
+#     exit(main(argv))
